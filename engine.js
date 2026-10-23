@@ -196,7 +196,9 @@ document.addEventListener('mousemove',e=>{if(!locked()||!g||g.paused)return;cons
 document.addEventListener('mousedown',e=>{
   if(e.button||!locked()||!g||g.paused)return;
   g.fire=true;
-  if(g.sc.cat==='click'){g.shots++;const h=raycast();if(h)kill(h);else thud()}
+  const h=raycast();
+  if(g.sc.cat==='click'){g.shots++;if(h)kill(h);else thud()}
+  else if(!h)thud(); // tracking/switching: pressing fire off target is a miss click too
 });
 document.addEventListener('mouseup',e=>{if(!e.button&&g)g.fire=false});
 document.addEventListener('keydown',e=>{
