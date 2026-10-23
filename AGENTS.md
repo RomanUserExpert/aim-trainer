@@ -4,15 +4,29 @@ This is a tiny browser aim trainer. People open `index.html` and ask an AI agent
 (Claude Code, Codex, Cursor, Copilot…) to add their own scenarios or tweak things.
 Read this before changing anything.
 
+## Files
+
+| File | What's there |
+|---|---|
+| `index.html` | markup only: menu, settings, overlays; loads the CSS and the three scripts |
+| `style.css` | all styles |
+| `engine.js` | settings `S`, WebGL rendering, scenario toolkit (helpers), game loop, scoring, raw mouse input |
+| `scenarios.js` | the `SC` array: **all scenarios, add yours here** |
+| `ui.js` | tabs, scenario list, presets, results, settings binding; runs the initial render |
+
 ## Hard rules
 
-1. **One file, no dependencies, no build.** Everything lives in `index.html`
-   (HTML + CSS + one `<script>`). No npm, no bundler, no CDN libraries, no
-   images or audio files. Sounds are synthesized with Web Audio, graphics are
-   raw WebGL2.
-2. **Stay small and light.** The file is ~36 KB; keep it under ~60 KB. Don't
-   allocate big arrays or create DOM nodes every frame. Rendering stops
-   completely in menus and on pause, so keep it that way: the only
+1. **No dependencies, no build, opens from disk.** It must keep working by
+   double-clicking `index.html` (a `file://` URL). So scripts are plain
+   `<script src>` tags, **not ES modules** (`type="module"` and `import` are
+   blocked on `file://`). The scripts share top-level names; load order is
+   `engine.js` → `scenarios.js` → `ui.js`, and code that runs at load time may
+   only use names from its own file or earlier ones. No npm, no bundler, no CDN
+   libraries, no images or audio files: sounds are synthesized with Web Audio,
+   graphics are raw WebGL2. Don't add new files without a good reason.
+2. **Stay small and light.** All files together are ~36 KB; keep them under
+   ~60 KB. Don't allocate big arrays or create DOM nodes every frame. Rendering
+   stops completely in menus and on pause, so keep it that way: the only
    `requestAnimationFrame` loop is `frame()` and it runs only while playing.
 3. **Don't touch the mouse math.** Turn per mouse count is
    `sens × game yaw` (`dpc()`), mouse input is raw
@@ -24,16 +38,15 @@ Read this before changing anything.
    few comments, no frameworks.
 5. **Every scenario lasts 60 s** (`DUR`). Scores and records depend on it.
 
-## How the code is laid out (inside `<script>`)
+## Inside `engine.js`
 
 | Section | What's there |
 |---|---|
 | `settings` | `S` (persisted to `localStorage['aim.s']`), `BEST` records (`localStorage['aim.b']`), `GAMES` yaw table, `dpc()` |
 | `webgl` | shaders: `SP` spheres, `RM` room grid, `BR` health-bar rects; `draw()`, `healthBars()` |
-| `targets & scenarios` | helpers + the `SC` array: **this is where scenarios live** |
+| `targets & scenarios` | the scenario toolkit: `T`, `ang`, `free`, `move`, `box`, `strafe`, `one`, `sw` |
 | `game` | `newGame(id)`, `raycast()`, `kill()`, `frame()`, `stats()` scoring, `end()` |
 | `input` | pointer lock / raw input, mouse handlers, hotkeys |
-| `ui` | tabs, scenario list, presets, results, settings binding |
 
 ## World coordinates
 
@@ -48,7 +61,8 @@ Read this before changing anything.
 
 ## Adding a scenario
 
-Add one object to the `SC` array. It shows up automatically in the scenario
+Add one object to the `SC` array in `scenarios.js`. Usually that is the only
+file you need to touch. It shows up automatically in the scenario
 list, in its category preset and in the **Full** preset; records are stored per
 scenario and target size.
 
@@ -70,7 +84,7 @@ What the category means:
 | `track` | hold LMB on the target; targets are never destroyed | share of time on target × 10 000 |
 | `switch` | hold LMB to drain `hp` (seconds of holding); at 0 the target dies and `kill()` runs; a health bar is drawn automatically | kills × 100 × accuracy |
 
-### Helpers you should reuse
+### Helpers you should reuse (defined in `engine.js`)
 
 - `T(pos, radius, extra)` creates a target: `{p:[x,y,z], v:[vx,vy,vz], r, hp, max, cd, on}` plus any `extra` fields.
 - `ang(yawDeg, pitchDeg, dist)` gives a point at that angle from the start view direction.
@@ -108,24 +122,25 @@ Switching, 5 static targets with 0.3 s of health each:
 ```
 
 Put the new object next to the scenarios of the same category, so the lists
-stay grouped. The preset card layout grows on its own.
+stay grouped. The preset card layout grows on its own. Put helpers that only
+your scenario needs (like `orbitPos`) at the top of `scenarios.js`.
 
 ## Changing other things
 
-- **Colors and sounds:** add a key to the `S` defaults, an `<input id="key">`
-  inside a `<label>` in the Settings tab, and the key to the binding list
-  (`for(const k of[...])`). Range inputs with a `<b></b>` in their label show
-  their value automatically.
-- **Scoring:** `stats()`. Changing a formula invalidates existing records, so
-  say so to the user.
-- **Hit feedback:** `marker()` (CSS hit marker), `beep()`, `tick()`, `thud()`.
+- **A new setting:** add a key to the `S` defaults (`engine.js`), an
+  `<input id="key">` inside a `<label>` in the Settings tab (`index.html`), and
+  the key to the binding list `for(const k of[...])` (`ui.js`). Range inputs
+  with a `<b></b>` in their label show their value automatically.
+- **Scoring:** `stats()` in `engine.js`. Changing a formula invalidates
+  existing records, so say so to the user.
+- **Hit feedback:** `marker()` (CSS hit marker in `style.css`), `beep()`,
+  `tick()`, `thud()`.
 
 ## Checking your change
 
 There are no tests. Do this:
 
-1. `node --check` on the script: extract it, e.g.
-   `sed -n '/<script>/,/<\/script>/p' index.html | sed '1d;$d' > /tmp/s.js && node --check /tmp/s.js`.
+1. Syntax: `node --check engine.js && node --check scenarios.js && node --check ui.js`.
 2. Serve the folder (`python -m http.server 8765`) and open
    `http://127.0.0.1:8765/` in Chrome. Check the console for errors.
 3. Pointer lock needs a real click, so to exercise a scenario from the
