@@ -69,7 +69,7 @@ function info(){
     (dpi&&!cm?` = ${(360*2.54/(k*dpi)).toFixed(1)} cm at ${dpi} DPI.`:'.')+(dpi?'':' DPI is auto: browsers can\'t read it, your mouse is used as it is.');
 }
 // Custom unlocks the DPI field; cm/360 needs a DPI, so there it's always custom
-function dpiField(){const cm=S.game==='cm',c=cm||S.dpiC;$('dpiC').checked=c;$('dpiC').disabled=cm;$('dpi').disabled=!c;$('dpi').value=c?S.dpi:'';$('dpi').placeholder='Auto'}
+function dpiField(){const cm=S.game==='cm',c=cm||S.dpiC;$('dpiC').checked=c;$('dpiC').disabled=cm;$('dpi').disabled=!c;$('dpi').value=S.dpi}
 $('dpiC').addEventListener('change',e=>{S.dpiC=e.target.checked;save('aim.s',S);dpiField();info()});
 $('game').innerHTML=Object.entries(GAMES).map(([k,[n]])=>`<option value="${k}">${n}</option>`).join('');
 function crosshair(){
