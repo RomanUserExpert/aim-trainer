@@ -60,7 +60,6 @@ $('s-pr').onclick=e=>{
   const p=b.dataset.p;S.reps[p]=Math.max(1,Math.min(5,(S.reps[p]||1)+ +b.dataset.d));save('aim.s',S);renderPresets();
 };
 function info(){
-  // with a game preset DPI isn't needed: raw counts × sens × yaw is the same turn as in-game at any DPI
   // DPI only matters for cm/360: with a game preset, raw counts × sens × yaw already turns like in-game at any DPI
   const k=dpc(),cm=S.game==='cm';
   $('sensT').textContent=cm?'cm/360':'In-game sensitivity';$('dpiL').hidden=!cm;
