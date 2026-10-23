@@ -61,10 +61,16 @@ $('s-pr').onclick=e=>{
 };
 function info(){
   // with a game preset DPI isn't needed: raw counts × sens × yaw is the same turn as in-game at any DPI
-  const k=dpc(),cm=S.game==='cm';
-  $('sensT').textContent=cm?'cm/360':'In-game sensitivity';$('dpiL').hidden=!cm;
-  $('info').textContent=isFinite(k)&&k>0?(cm?'':'Same turn per mouse movement as in-game, at whatever DPI your mouse uses. ')+`360° = ${Math.round(360/k)} counts.`:'Check the sensitivity'+(cm?' and DPI':'')+'.';
+  // DPI: browsers can't read it, so Auto means raw counts as the mouse sends them; Custom DPI only adds a cm/360 readout
+  const k=dpc(),cm=S.game==='cm',dpi=cm||S.dpiC?S.dpi:0;
+  $('sensT').textContent=cm?'cm/360':'In-game sensitivity';
+  $('info').textContent=!(isFinite(k)&&k>0)?'Check the sensitivity'+(cm?' and DPI':'')+'.':
+    (cm?'':'Same turn per mouse movement as in-game, at any mouse DPI. ')+`360° = ${Math.round(360/k)} counts`+
+    (dpi&&!cm?` = ${(360*2.54/(k*dpi)).toFixed(1)} cm at ${dpi} DPI.`:'.')+(dpi?'':' DPI is auto: browsers can\'t read it, your mouse is used as it is.');
 }
+// Custom unlocks the DPI field; cm/360 needs a DPI, so there it's always custom
+function dpiField(){const cm=S.game==='cm',c=cm||S.dpiC;$('dpiC').checked=c;$('dpiC').disabled=cm;$('dpi').disabled=!c;$('dpi').value=c?S.dpi:'';$('dpi').placeholder='Auto'}
+$('dpiC').addEventListener('change',e=>{S.dpiC=e.target.checked;save('aim.s',S);dpiField();info()});
 $('game').innerHTML=Object.entries(GAMES).map(([k,[n]])=>`<option value="${k}">${n}</option>`).join('');
 function crosshair(){
   // outline: 1 = all edges, 0.5 = half the edges (right + bottom), 0 = none; xOutA = its opacity
@@ -93,8 +99,8 @@ $('vTrack').addEventListener('change',tick);
 $('vMiss').addEventListener('change',thud);
 for(const k of['size','game','dpi','fov','ar','vClick','vTrack','vMiss','tCol','wCol','grid','xType','xCol','xOut','xOutA','xDot','xLen','xThk','xGap']){
   const el=$(k);el.value=S[k];
-  el.addEventListener('input',()=>{S[k]=el.type==='color'||isNaN(+el.value)?el.value:+el.value;looks();if(k==='game')$('sens').value=S.game==='cm'?S.cm:S.sens;save('aim.s',S);info();if(k==='size')renderList()});
+  el.addEventListener('input',()=>{S[k]=el.type==='color'||isNaN(+el.value)?el.value:+el.value;looks();if(k==='game'){$('sens').value=S.game==='cm'?S.cm:S.sens;dpiField()}save('aim.s',S);info();if(k==='size')renderList()});
 }
 $('sens').value=S.game==='cm'?S.cm:S.sens;
 $('sens').addEventListener('input',e=>{S[S.game==='cm'?'cm':'sens']=+e.target.value;save('aim.s',S);info()});
-renderList();renderPresets();tabs();info();looks();setRaw(null);
+renderList();renderPresets();tabs();dpiField();info();looks();setRaw(null);
