@@ -80,13 +80,6 @@ input[type=range]{padding:6px 0;accent-color:var(--acc)}
 @keyframes hm{from{opacity:1;transform:rotate(var(--a)) translateX(6px)}to{opacity:1;transform:rotate(var(--a)) translateX(10px)}}
 input[type=color]{height:34px;padding:2px;cursor:pointer;width:100%}
 .xp{height:72px;border-radius:8px;border:1px solid var(--line);position:relative;margin-bottom:12px}
-.xc{position:absolute;left:50%;top:50%}
-.fld{display:flex;flex-direction:column;gap:4px;color:var(--mut);font-size:12px}
-.dpi{display:flex;gap:8px;align-items:center}
-.dpi input[type=number]{flex:1;min-width:0}
-label.chk{flex-direction:row;align-items:center;gap:4px;white-space:nowrap;cursor:pointer}
-.chk input{accent-color:var(--acc);margin:0}
-input:disabled{opacity:.5}
-.xt{position:absolute;left:50%;top:50%;border-radius:50%;transform:translate(-50%,-50%)}
+.xc{position:absolute;left:50%;top:50%}.xt{position:absolute;left:50%;top:50%;border-radius:50%;transform:translate(-50%,-50%)}
 .hint{color:var(--mut);font-size:12px;margin-top:24px;text-align:center}
 @media (max-width:700px){.cols{grid-template-columns:1fr}}
