@@ -10,7 +10,7 @@ const GAMES={cs2:['CS2 / CS:GO',.022],apex:['Apex Legends',.022],val:['Valorant'
 const DUR=60;
 let g=null,raf=0,ac;
 const S=Object.assign({sc:'grid',tab:'game',sub:'sc',reps:{click:1,track:1,switch:1,full:1},size:5,game:'cs2',sens:1,cm:35,dpi:800,fov:103,ar:0,
-  vClick:60,vTrack:40,vMiss:50,tCol:'#1fa6f0',wCol:'#83878d',grid:50,xType:'dot',xCol:'#3dff9e',xOut:1,xDot:4,xLen:6,xThk:2,xGap:3},load('aim.s'));
+  vClick:60,vTrack:40,vMiss:50,tCol:'#1fa6f0',wCol:'#83878d',grid:50,xType:'dot',xCol:'#3dff9e',xOut:1,xOutA:100,xDot:4,xLen:6,xThk:2,xGap:3},load('aim.s'));
 if(['#ff6b2e','#45b4e6'].includes(S.tCol))S.tCol='#1fa6f0'; // old default colors move to the new defaults
 if(['#1c1f26','#9a9ea4'].includes(S.wCol))S.wCol='#83878d';
 S.ar=Math.abs(S.ar); // old saved "-1.3333" (stretched 4:3) maps to 4:3

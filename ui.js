@@ -67,7 +67,8 @@ function info(){
 }
 $('game').innerHTML=Object.entries(GAMES).map(([k,[n]])=>`<option value="${k}">${n}</option>`).join('');
 function crosshair(){
-  const c=S.xCol,o=+S.xOut,sh=o?`box-shadow:0 0 0 1px rgba(0,0,0,${o});`:'';
+  // outline: 1 = all edges, 0.5 = half the edges (right + bottom), 0 = none; xOutA = its opacity
+  const c=S.xCol,o=+S.xOut,a=S.xOutA/100,sh=o?`box-shadow:${o<1?'1px 1px 0 0':'0 0 0 1px'} rgba(0,0,0,${a});`:'';
   const r=(x,y,w,h,ex='')=>`<i style="left:${x}px;top:${y}px;width:${w}px;height:${h}px;background:${c};${sh}${ex}"></i>`;
   if(S.xType==='dot'){const d=+S.xDot;return r(-d/2,-d/2,d,d,'border-radius:50%')}
   const t=+S.xThk,l=+S.xLen,gp=+S.xGap,h=t/2;
@@ -82,11 +83,12 @@ function looks(){
   $('xhp').style.background=`linear-gradient(${ln} 1px,transparent 1px) center/14px 14px,linear-gradient(90deg,${ln} 1px,transparent 1px) center/14px 14px,${S.wCol}`;
   for(const e of document.querySelectorAll('.xd'))e.style.display=S.xType==='dot'?'':'none';
   for(const e of document.querySelectorAll('.xx'))e.style.display=S.xType==='dot'?'none':'';
+  for(const e of document.querySelectorAll('.xo'))e.style.display=+S.xOut?'':'none';
 }
 $('vClick').addEventListener('change',()=>beep(880,S.vClick));
 $('vTrack').addEventListener('change',tick);
 $('vMiss').addEventListener('change',thud);
-for(const k of['size','game','dpi','fov','ar','vClick','vTrack','vMiss','tCol','wCol','grid','xType','xCol','xOut','xDot','xLen','xThk','xGap']){
+for(const k of['size','game','dpi','fov','ar','vClick','vTrack','vMiss','tCol','wCol','grid','xType','xCol','xOut','xOutA','xDot','xLen','xThk','xGap']){
   const el=$(k);el.value=S[k];
   el.addEventListener('input',()=>{S[k]=el.type==='color'||isNaN(+el.value)?el.value:+el.value;looks();if(k==='game')$('sens').value=S.game==='cm'?S.cm:S.sens;save('aim.s',S);info();if(k==='size')renderList()});
 }
