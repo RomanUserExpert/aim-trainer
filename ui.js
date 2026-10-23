@@ -81,6 +81,9 @@ function looks(){
   const b=rgb(S.wCol),L=b[0]*.3+b[1]*.59+b[2]*.11,a=S.grid/100*.7;
   const ln=`rgb(${b.map(x=>{const l=L>.45?x*.65:Math.min(1,x*2.2+.04);return Math.round(255*(x+(l-x)*a))})})`;
   $('xhp').style.background=`linear-gradient(${ln} 1px,transparent 1px) center/14px 14px,linear-gradient(90deg,${ln} 1px,transparent 1px) center/14px 14px,${S.wCol}`;
+  // a target under the crosshair, shaded like in-game, grows with the target size setting
+  const t=$('xht'),d=16+S.size*4+'px',sh=k=>`rgb(${rgb(S.tCol).map(x=>Math.round(255*Math.min(1,x*k)))})`;
+  t.style.width=t.style.height=d;t.style.background=`radial-gradient(circle at 35% 30%,${sh(1.15)},${S.tCol} 45%,${sh(.45)})`;
   for(const e of document.querySelectorAll('.xd'))e.style.display=S.xType==='dot'?'':'none';
   for(const e of document.querySelectorAll('.xx'))e.style.display=S.xType==='dot'?'none':'';
   for(const e of document.querySelectorAll('.xo'))e.style.display=+S.xOut?'':'none';
