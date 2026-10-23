@@ -116,7 +116,7 @@ const rgb=h=>[1,3,5].map(i=>parseInt(h.slice(i,i+2),16)/255);
 
 function newGame(id){
   const sc=SC.find(s=>s.id===id)||SC[0];
-  g={sc,r:.08+S.size*.06,dpc:dpc(),dur:DUR,el:0,yaw:0,pitch:0,targets:[],shots:0,kills:0,onT:0,fireT:0,fire:false,paused:true,done:false,last:0,hud:0,tick:0,tc:rgb(S.tCol),wc:rgb(S.wCol)};
+  g={sc,r:.08+S.size*.06,dpc:dpc(),dur:DUR,el:0,yaw:0,pitch:0,targets:[],shots:0,kills:0,onT:0,fireT:0,fire:false,paused:true,done:false,last:0,hud:0,tick:0,mtick:0,tc:rgb(S.tCol),wc:rgb(S.wCol)};
   sc.init(g);
 }
 function raycast(){
@@ -136,6 +136,8 @@ function frame(now){
   if(g.sc.cat!=='click'&&g.fire){g.fireT+=dt;if(hit){g.onT+=dt;on=true;if(g.sc.cat==='switch'&&(hit.hp-=dt)<=0)kill(hit)}}
   // tracking/switching: tick sound + hit marker every 0.1 s while on target
   if(!on)g.tick=0;else if((g.tick-=dt)<=0){g.tick=.1;tick();marker();hit.shown=hit.hp}
+  // holding fire off target: miss thud at the same 0.1 s rate
+  if(on||!g.fire||g.sc.cat==='click')g.mtick=0;else if((g.mtick-=dt)<=0){g.mtick=.1;thud()}
   draw();
   if(g.el>=g.dur)return end();
   if(++g.hud%6===0)hud();
@@ -198,7 +200,6 @@ document.addEventListener('mousedown',e=>{
   g.fire=true;
   const h=raycast();
   if(g.sc.cat==='click'){g.shots++;if(h)kill(h);else thud()}
-  else if(!h)thud(); // tracking/switching: pressing fire off target is a miss click too
 });
 document.addEventListener('mouseup',e=>{if(!e.button&&g)g.fire=false});
 document.addEventListener('keydown',e=>{
